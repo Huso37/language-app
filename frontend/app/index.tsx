@@ -1,42 +1,37 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Redirect } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-export default function WelcomeScreen() {
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.emoji}>🧠</Text>
-        <Text style={styles.title}>Language App</Text>
-        <Text style={styles.subtitle}>
-          Welcome! This will become your vocabulary trainer.
-        </Text>
+import { hasCompletedInitSettings } from "@/lib/user-settings-storage";
+
+export default function Index() {
+  const [isReady, setIsReady] = useState(false);
+  const [hasCompletedInit, setHasCompletedInit] = useState(false);
+
+  useEffect(() => {
+    hasCompletedInitSettings()
+      .then(setHasCompletedInit)
+      .finally(() => setIsReady(true));
+  }, []);
+
+  if (!isReady) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#1F2937" />
       </View>
-    </SafeAreaView>
+    );
+  }
+
+  return (
+    <Redirect href={hasCompletedInit ? "/home" : "/init-settings"} />
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  loading: {
     flex: 1,
-    backgroundColor: "#F7F4EF",
-  },
-  container: {
-    flex: 1,
-    padding: 24,
+    alignItems: "center",
     justifyContent: "center",
-  },
-  emoji: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: "#1F2937",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#6B7280",
-    lineHeight: 24,
+    backgroundColor: "#F7F4EF",
   },
 });
