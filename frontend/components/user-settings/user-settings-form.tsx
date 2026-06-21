@@ -108,7 +108,6 @@ export function UserSettingsForm({
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          {showWelcome && <Text style={styles.emoji}>👋</Text>}
           <Text style={styles.title}>{showWelcome ? "Welcome to Language App" : title}</Text>
           <Text style={styles.subtitle}>
             {showWelcome
@@ -173,20 +172,23 @@ export function UserSettingsForm({
             ))}
           </View>
         </View>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            (pressed || isSubmitting) && styles.buttonPressed,
+          ]}
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Saving..." : submitLabel}
+          </Text>
+        </Pressable>    
+
       </ScrollView>
 
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (pressed || isSubmitting) && styles.buttonPressed,
-        ]}
-        onPress={handleSubmit}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Saving..." : submitLabel}
-        </Text>
-      </Pressable>
+      
     </View>
   );
 }

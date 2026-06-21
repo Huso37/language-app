@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AppHeader } from "@/components/app-header";
 import {
   EXPERIENCE_LEVELS,
   LEARNING_LANGUAGES,
@@ -67,6 +68,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <AppHeader />
       <Pressable
         style={({ pressed }) => [
           styles.devBackBtn,
@@ -76,9 +78,9 @@ export default function HomeScreen() {
       >
         <Text style={styles.devBackBtnText}>← Init settings (dev)</Text>
       </Pressable>
+
       <View style={styles.container}>
         <Text style={styles.emoji}>🧠</Text>
-        <Text style={styles.title}>Language App</Text>
 
         {settings === undefined ? (
           <ActivityIndicator style={styles.loader} color="#1F2937" />
@@ -103,6 +105,30 @@ export default function HomeScreen() {
           Welcome! This will become your vocabulary trainer.
         </Text>
       </View>
+
+        <View style={styles.lessonsRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.lessonsBtn,
+              pressed && styles.lessonsBtnPressed,
+            ]}
+            onPress={() => router.push("/lessons/new_lesson")}
+          >
+            <Text style={styles.lessonsBtnText}>Start a new lesson</Text>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.lessonsBtn,
+              pressed && styles.lessonsBtnPressed,
+            ]}
+            onPress={() => router.push("/lessons/old_lesson")}
+          >
+            <Text style={styles.lessonsBtnText}>Repeat a lesson</Text>
+          </Pressable>
+        </View>
+      
+
     </SafeAreaView>
   );
 }
@@ -119,12 +145,6 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 48,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: "#1F2937",
     marginBottom: 16,
   },
   settingsCard: {
@@ -185,5 +205,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "#374151",
+  },
+  lessonsBtn: {
+    alignSelf: "flex-start",
+    marginTop: 8,
+    marginLeft: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: "#E5E7EB",
+  },
+  lessonsBtnPressed: {
+    opacity: 0.85,
+  },
+  lessonsBtnText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  lessonsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
   },
 });
