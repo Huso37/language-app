@@ -11,16 +11,24 @@ import {
 
 import { SelectField } from "@/components/lesson/select-field";
 import {
-  DEFAULT_WORD_COUNT,
+  LESSON_CATEGORIES,
   LESSON_STYLES,
   LESSON_TYPES,
+  MAX_WORD_COUNT,
+  MIN_WORD_COUNT,
 } from "@/constants/lesson-options";
 import {
   EXPERIENCE_LEVELS,
   LEARNING_LANGUAGES,
   NATIVE_LANGUAGES,
 } from "@/constants/languages";
-import type { NewLessonConfig, LessonStyle, LessonType } from "@/types/lesson";
+import type {
+  LessonCategory,
+  LessonStyle,
+  LessonType,
+  NewLessonConfig,
+} from "@/types/lesson";
+import { parseWordCountInput } from "@/types/lesson";
 import type { ExperienceLevel, LanguageId, UserSettings } from "@/types/user-settings";
 
 type NewLessonFormProps = {
@@ -52,39 +60,58 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
     userSettings.experienceLevel,
   );
   const [lessonType, setLessonType] = useState<LessonType | null>("words");
-  const [wordCount, setWordCount] = useState(String(DEFAULT_WORD_COUNT));
+  const [wordCount, setWordCount] = useState("");
   const [lessonStyle, setLessonStyle] = useState<LessonStyle | null>("matching");
+  const [category, setCategory] = useState<LessonCategory | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleWordCountChange = (value: string) => {
+    setWordCount(value.replace(/[^\d]/g, ""));
+  };
+
   const handleStart = async () => {
-    if (!nativeLanguage) {
+    if (!nativeLanguage || !NATIVE_LANGUAGES.some((lang) => lang.id === nativeLanguage)) {
       Alert.alert("Missing language", "Please choose your default language.");
       return;
     }
-    if (!learningLanguage) {
+    if (
+      !learningLanguage ||
+      !availableLearningLanguages.some((lang) => lang.id === learningLanguage)
+    ) {
       Alert.alert("Missing language", "Please choose a learning language.");
       return;
     }
-    if (!experienceLevel) {
+    if (
+      !experienceLevel ||
+      !EXPERIENCE_LEVELS.some((level) => level.id === experienceLevel)
+    ) {
       Alert.alert("Missing level", "Complete your profile settings first.");
       return;
     }
-    if (!lessonType) {
+    if (!lessonType || !LESSON_TYPES.some((type) => type.id === lessonType)) {
       Alert.alert("Missing type", "Please choose a lesson type.");
       return;
     }
-    if (!lessonStyle) {
+    if (!lessonStyle || !LESSON_STYLES.some((style) => style.id === lessonStyle)) {
       Alert.alert("Missing style", "Please choose a lesson style.");
+      return;
+    }
+    if (!category || !LESSON_CATEGORIES.some((item) => item.id === category)) {
+      Alert.alert("Missing category", "Please choose a category.");
       return;
     }
 
     let parsedWordCount: number | undefined;
     if (lessonType === "words") {
-      parsedWordCount = Number(wordCount);
-      if (!wordCount.trim() || Number.isNaN(parsedWordCount) || parsedWordCount < 1) {
-        Alert.alert("Invalid number", "Please enter how many words you want.");
+      const count = parseWordCountInput(wordCount);
+      if (count === null) {
+        Alert.alert(
+          "Invalid number",
+          `Enter a whole number between ${MIN_WORD_COUNT} and ${MAX_WORD_COUNT}.`,
+        );
         return;
       }
+      parsedWordCount = count;
     }
 
     const config: NewLessonConfig = {
@@ -93,7 +120,9 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
       experienceLevel,
       lessonType,
       lessonStyle,
+      category,
       ...(lessonType === "words" ? { wordCount: parsedWordCount } : {}),
+      excludeWords: [],
     };
 
     setIsSubmitting(true);
@@ -115,8 +144,7 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
         <View style={styles.header}>
           <Text style={styles.title}>New lesson</Text>
           <Text style={styles.subtitle}>
-            Set up your lesson. These options will be sent to the backend in a
-            later step.
+            Configure your lesson, then we'll send it to the backend.
           </Text>
         </View>
 
@@ -145,6 +173,14 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
         />
 
         <SelectField
+          label="Category"
+          value={category}
+          options={toSelectOptions(LESSON_CATEGORIES)}
+          onChange={setCategory}
+          placeholder="Choose category"
+        />
+
+        <SelectField
           label="Lesson type"
           value={lessonType}
           options={toSelectOptions(LESSON_TYPES)}
@@ -158,9 +194,9 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
             <TextInput
               style={styles.input}
               value={wordCount}
-              onChangeText={setWordCount}
+              onChangeText={handleWordCountChange}
               keyboardType="number-pad"
-              placeholder="e.g. 10"
+              placeholder={`${MIN_WORD_COUNT}-${MAX_WORD_COUNT}`}
               placeholderTextColor="#9CA3AF"
             />
           </View>

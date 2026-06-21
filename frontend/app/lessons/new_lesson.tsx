@@ -3,7 +3,6 @@ import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AppHeader } from "@/components/app-header";
 import { NewLessonForm } from "@/components/lesson/new-lesson-form";
 import { getUserSettings } from "@/lib/user-settings-storage";
+import { setPendingLessonConfig } from "@/lib/lesson-session-store";
 import type { NewLessonConfig } from "@/types/lesson";
 import type { UserSettings } from "@/types/user-settings";
 
@@ -38,11 +38,8 @@ export default function NewLessonScreen() {
   );
 
   const handleStart = async (config: NewLessonConfig) => {
-    // TODO: send config to backend and navigate to lesson screen
-    Alert.alert(
-      "Lesson ready (preview)",
-      JSON.stringify(config, null, 2),
-    );
+    setPendingLessonConfig(config);
+    router.push("/lessons/loading");
   };
 
   return (
