@@ -1,17 +1,20 @@
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, type Href } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/components/app-header";
 import { generateLesson, LessonServiceError } from "@/lib/lesson-service";
+import { getLessonGameRoute } from "@/lib/lesson-routes";
 import {
   getPendingLessonConfig,
   setCurrentLesson,
 } from "@/lib/lesson-session-store";
+import { saveLesson } from "@/lib/saved-lessons-storage";
 
 export default function LessonLoadingScreen() {
   const [error, setError] = useState<string | null>(null);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const config = getPendingLessonConfig();
@@ -21,23 +24,26 @@ export default function LessonLoadingScreen() {
       return;
     }
 
-    let isActive = true;
+    const requestId = ++requestIdRef.current;
 
     const loadLesson = async () => {
       try {
         const lesson = await generateLesson(config);
 
-        if (!isActive) return;
+        if (requestId !== requestIdRef.current) return;
 
+        await saveLesson(lesson);
         setCurrentLesson(lesson);
-        router.replace("/lessons/lesson_session");
+        router.replace(getLessonGameRoute(lesson) as Href);
       } catch (err) {
-        if (!isActive) return;
+        if (requestId !== requestIdRef.current) return;
 
         const message =
           err instanceof LessonServiceError
             ? err.message
-            : "Could not reach the backend. Check your connection and API URL.";
+            : err instanceof Error && err.message === "Lesson storage is full."
+              ? err.message
+              : "Could not reach the backend. Check your connection and API URL.";
 
         setError(message);
       }
@@ -46,10 +52,9 @@ export default function LessonLoadingScreen() {
     loadLesson();
 
     return () => {
-      isActive = false;
+      requestIdRef.current += 1;
     };
   }, []);
-
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <AppHeader />

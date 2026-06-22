@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -12,8 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/components/app-header";
 import { NewLessonForm } from "@/components/lesson/new-lesson-form";
-import { getUserSettings } from "@/lib/user-settings-storage";
 import { setPendingLessonConfig } from "@/lib/lesson-session-store";
+import { canSaveNewLesson } from "@/lib/saved-lessons-storage";
+import { getUserSettings } from "@/lib/user-settings-storage";
+import { MAX_SAVED_LESSONS } from "@/types/saved-lesson";
 import type { NewLessonConfig } from "@/types/lesson";
 import type { UserSettings } from "@/types/user-settings";
 
@@ -38,6 +41,23 @@ export default function NewLessonScreen() {
   );
 
   const handleStart = async (config: NewLessonConfig) => {
+    const hasRoom = await canSaveNewLesson();
+
+    if (!hasRoom) {
+      Alert.alert(
+        "Lesson storage full",
+        `You can save up to ${MAX_SAVED_LESSONS} lessons. Delete one before creating a new lesson.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete a lesson",
+            onPress: () => router.push("/lessons/old_lesson"),
+          },
+        ],
+      );
+      return;
+    }
+
     setPendingLessonConfig(config);
     router.push("/lessons/loading");
   };
