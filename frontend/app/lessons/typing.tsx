@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/components/app-header";
+import { TypingGame } from "@/components/lesson/games/typing-game";
 import { getCurrentLesson } from "@/lib/lesson-session-store";
 import type { GenerateLessonResponse } from "@/types/lesson";
 
@@ -52,10 +53,11 @@ export default function TypingLessonScreen() {
         </Pressable>
 
         <Text style={styles.pageTitle}>Typing</Text>
-        <Text style={styles.placeholder}>
-          Typing game UI coming next. Lesson data is loaded and ready.
+        <Text style={styles.pageSubtitle}>
+          {lesson.category} · {lesson.count} words
         </Text>
-        <Text style={styles.rawJson}>{JSON.stringify(lesson.words, null, 2)}</Text>
+
+        <TypingGame words={lesson.words} />
       </View>
     </SafeAreaView>
   );
@@ -110,6 +112,11 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1F2937",
     marginBottom: 12,
+  },
+  pageSubtitle: {
+    fontSize: 15,
+    color: "#6B7280",
+    marginBottom: 16,
   },
   placeholder: {
     fontSize: 16,
