@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader } from "@/components/app-header";
 import { NewLessonForm } from "@/components/lesson/new-lesson-form";
 import { setPendingLessonConfig } from "@/lib/lesson-session-store";
 import { canSaveNewLesson } from "@/lib/saved-lessons-storage";
@@ -64,15 +63,23 @@ export default function NewLessonScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <AppHeader />
-      <View style={styles.content}>
+      <View style={styles.screenHeader}>
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          style={({ pressed }) => [
+            styles.backIconBtn,
+            pressed && styles.backBtnPressed,
+          ]}
           onPress={() => router.back()}
         >
-          <Text style={styles.backBtnText}>← Back</Text>
+          <Text style={styles.backIcon}>‹</Text>
         </Pressable>
 
+        <Text style={styles.headerTitle}>New lesson</Text>
+
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <View style={styles.content}>
         {settings === undefined ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color="#1F2937" />
@@ -110,22 +117,39 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
   },
-  backBtn: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
+  screenHeader: {
+    height: 56,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+    backgroundColor: "#F7F4EF",
+  },
+  backIconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+  },
+  backIcon: {
+    fontSize: 36,
+    lineHeight: 36,
+    fontWeight: "600",
+    color: "#2563EB",
   },
   backBtnPressed: {
     opacity: 0.85,
   },
-  backBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#1F2937",
+  },
+  headerSpacer: {
+    width: 44,
   },
   centered: {
     flex: 1,

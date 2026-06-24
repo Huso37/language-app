@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -9,50 +9,16 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getSavedLessonCount } from "@/lib/saved-lessons-storage";
 
 import { AppHeader } from "@/components/app-header";
-import {
-  EXPERIENCE_LEVELS,
-  LEARNING_LANGUAGES,
-  NATIVE_LANGUAGES,
-} from "@/constants/languages";
+import { LEARNING_LANGUAGES } from "@/constants/languages";
 import { getUserSettings } from "@/lib/user-settings-storage";
 import type { UserSettings } from "@/types/user-settings";
 
-function getLanguageLabel(id: string) {
-  const option = [...NATIVE_LANGUAGES, ...LEARNING_LANGUAGES].find(
-    (lang) => lang.id === id,
-  );
+function getLearningLanguageLabel(id: string) {
+  const option = LEARNING_LANGUAGES.find((lang) => lang.id === id);
   return option ? `${option.flag} ${option.label}` : id;
-}
-
-function getLevelLabel(id: string) {
-  return EXPERIENCE_LEVELS.find((level) => level.id === id)?.label ?? id;
-}
-
-function formatSettings(settings: UserSettings) {
-  return [
-    { label: "Name", value: settings.userName || "—" },
-    {
-      label: "Native language",
-      value: settings.nativeLanguage
-        ? getLanguageLabel(settings.nativeLanguage)
-        : "—",
-    },
-    {
-      label: "Learning",
-      value:
-        settings.learningLanguages.length > 0
-          ? settings.learningLanguages.map(getLanguageLabel).join(", ")
-          : "—",
-    },
-    {
-      label: "Level",
-      value: settings.experienceLevel
-        ? getLevelLabel(settings.experienceLevel)
-        : "—",
-    },
-  ];
 }
 
 export default function HomeScreen() {
@@ -60,75 +26,76 @@ export default function HomeScreen() {
     undefined,
   );
 
+  const [lessonCount, setLessonCount] = useState<number | undefined>(undefined);
+
   useFocusEffect(
     useCallback(() => {
       getUserSettings().then(setSettings);
     }, []),
   );
 
+  useEffect(() => {
+      getSavedLessonCount().then(setLessonCount);
+    }, []);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <AppHeader />
-      <Pressable
-        style={({ pressed }) => [
-          styles.devBackBtn,
-          pressed && styles.devBackBtnPressed,
-        ]}
-        onPress={() => router.push("/init-settings")}
-      >
-        <Text style={styles.devBackBtnText}>← Init settings (dev)</Text>
-      </Pressable>
 
       <View style={styles.container}>
-        <Text style={styles.emoji}>🧠</Text>
-
         {settings === undefined ? (
           <ActivityIndicator style={styles.loader} color="#1F2937" />
         ) : settings === null ? (
-          <View style={styles.settingsCard}>
-            <Text style={styles.settingsTitle}>Stored settings (debug)</Text>
-            <Text style={styles.emptyText}>No settings saved yet.</Text>
-          </View>
+          <>
+            <Text style={styles.title}>Welcome</Text>
+            <Text style={styles.subtitle}>
+              Finish your initial settings to start learning.
+            </Text>
+          </>
         ) : (
-          <View style={styles.settingsCard}>
-            <Text style={styles.settingsTitle}>Stored settings (debug)</Text>
-            {formatSettings(settings).map((row) => (
-              <View key={row.label} style={styles.row}>
-                <Text style={styles.rowLabel}>{row.label}</Text>
-                <Text style={styles.rowValue}>{row.value}</Text>
-              </View>
-            ))}
-          </View>
+          <>
+            <Text style={styles.title}>Hi {settings.userName || "there"}</Text>
+            <Text style={styles.subtitle}>
+              Ready to start learning{" "}
+              {settings.learningLanguages.length > 0
+                ? settings.learningLanguages.map(getLearningLanguageLabel).join(", ")
+                : "a new language"}
+              ?
+            </Text>
+          </>
         )}
 
-        <Text style={styles.subtitle}>
-          Welcome! This will become your vocabulary trainer.
-        </Text>
-      </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statLabel}>Lessons done</Text>
+          {lessonCount === undefined ? (
+            <ActivityIndicator color="#1F2937" />
+          ) : (
+            <Text style={styles.statValue}>{lessonCount}</Text>
+          )}
+        </View>
 
-        <View style={styles.lessonsRow}>
+        <View style={styles.actions}>
           <Pressable
             style={({ pressed }) => [
-              styles.lessonsBtn,
-              pressed && styles.lessonsBtnPressed,
+              styles.primaryButton,
+              pressed && styles.buttonPressed,
             ]}
             onPress={() => router.push("/lessons/new_lesson")}
           >
-            <Text style={styles.lessonsBtnText}>Start a new lesson</Text>
+            <Text style={styles.primaryButtonText}>Start a new lesson</Text>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [
-              styles.lessonsBtn,
-              pressed && styles.lessonsBtnPressed,
+              styles.secondaryButton,
+              pressed && styles.buttonPressed,
             ]}
             onPress={() => router.push("/lessons/old_lesson")}
           >
-            <Text style={styles.lessonsBtnText}>Repeat a lesson</Text>
+            <Text style={styles.secondaryButtonText}>Repeat a lesson</Text>
           </Pressable>
         </View>
-      
-
+      </View>
     </SafeAreaView>
   );
 }
@@ -143,89 +110,72 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: "center",
   },
-  emoji: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  settingsCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    gap: 10,
-  },
-  settingsTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#6B7280",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  row: {
-    gap: 2,
-  },
-  rowLabel: {
-    fontSize: 13,
-    color: "#9CA3AF",
-  },
-  rowValue: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  emptyText: {
-    fontSize: 15,
-    color: "#9CA3AF",
-    fontStyle: "italic",
-  },
   loader: {
     marginBottom: 16,
   },
+  title: {
+    fontSize: 34,
+    fontWeight: "900",
+    color: "#1F2937",
+    marginBottom: 10,
+  },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#6B7280",
-    lineHeight: 24,
+    lineHeight: 27,
+    marginBottom: 10,
   },
-  devBackBtn: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    marginLeft: 24,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
+  actions: {
+    gap: 14,
   },
-  devBackBtnPressed: {
+  primaryButton: {
+    backgroundColor: "#1F2937",
+    borderRadius: 18,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    alignItems: "center",
+  },
+  secondaryButton: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 18,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    alignItems: "center",
+  },
+  buttonPressed: {
     opacity: 0.85,
   },
-  devBackBtnText: {
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  secondaryButtonText: {
+    color: "#1F2937",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  statCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    gap: 8,
+    marginBottom: 10,
+  },
+  statLabel: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+    fontWeight: "800",
+    color: "#6B7280",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  lessonsBtn: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    marginLeft: 24,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
-  },
-  lessonsBtnPressed: {
-    opacity: 0.85,
-  },
-  lessonsBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
-  },
-  lessonsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
+  statValue: {
+    fontSize: 36,
+    fontWeight: "900",
+    color: "#1F2937",
   },
 });

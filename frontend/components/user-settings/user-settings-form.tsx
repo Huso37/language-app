@@ -27,6 +27,7 @@ type UserSettingsFormProps = {
   initialValues?: Partial<UserSettings>;
   onSubmit: (settings: UserSettings) => void | Promise<void>;
   submitLabel?: string;
+  showHeader?: boolean;
   showWelcome?: boolean;
   title?: string;
   subtitle?: string;
@@ -36,6 +37,7 @@ export function UserSettingsForm({
   initialValues,
   onSubmit,
   submitLabel = "Save",
+  showHeader = true,
   showWelcome = false,
   title = "Profile settings",
   subtitle = "Update your language preferences anytime.",
@@ -107,14 +109,18 @@ export function UserSettingsForm({
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>{showWelcome ? "Welcome to Language App" : title}</Text>
-          <Text style={styles.subtitle}>
-            {showWelcome
-              ? "Let's set up your profile. You can change these later in settings."
-              : subtitle}
-          </Text>
-        </View>
+        {showHeader && (
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              {showWelcome ? "Welcome to Language App" : title}
+            </Text>
+            <Text style={styles.subtitle}>
+              {showWelcome
+                ? "Let's set up your profile. You can change these later in settings."
+                : subtitle}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Your name</Text>

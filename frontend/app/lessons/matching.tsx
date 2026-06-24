@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader } from "@/components/app-header";
 import { MatchingGame } from "@/components/lesson/games/matching-game";
 import { getCurrentLesson } from "@/lib/lesson-session-store";
 import type { GenerateLessonResponse } from "@/types/lesson";
@@ -24,7 +23,22 @@ export default function MatchingLessonScreen() {
   if (lesson === null || lesson.lessonStyle !== "matching") {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-        <AppHeader />
+        <View style={styles.screenHeader}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.backIconBtn,
+              pressed && styles.backBtnPressed,
+            ]}
+            onPress={() => router.replace("/home")}
+          >
+            <Text style={styles.backIcon}>‹</Text>
+          </Pressable>
+
+          <Text style={styles.headerTitle}>Matching lesson</Text>
+
+          <View style={styles.headerSpacer} />
+        </View>
+
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>No matching lesson</Text>
           <Text style={styles.emptyText}>
@@ -43,16 +57,23 @@ export default function MatchingLessonScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <AppHeader />
-      <View style={styles.content}>
+      <View style={styles.screenHeader}>
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          style={({ pressed }) => [
+            styles.backIconBtn,
+            pressed && styles.backBtnPressed,
+          ]}
           onPress={() => router.replace("/home")}
         >
-          <Text style={styles.backBtnText}>← Home</Text>
+          <Text style={styles.backIcon}>‹</Text>
         </Pressable>
 
-        <Text style={styles.pageTitle}>Matching</Text>
+        <Text style={styles.headerTitle}>Matching lesson</Text>
+
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <View style={styles.content}>
         <Text style={styles.pageSubtitle}>
           {lesson.category} · {lesson.count} words
         </Text>
@@ -72,6 +93,37 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
   },
+  screenHeader: {
+    height: 56,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+    backgroundColor: "#F7F4EF",
+  },
+  backIconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+  },
+  backIcon: {
+    fontSize: 36,
+    lineHeight: 36,
+    fontWeight: "600",
+    color: "#2563EB",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#1F2937",
+  },
+  headerSpacer: {
+    width: 44,
+  },
   emptyContainer: {
     flex: 1,
     alignItems: "center",
@@ -90,32 +142,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 24,
   },
-  backBtn: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    marginBottom: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
-  },
   backBtnPressed: {
     opacity: 0.85,
-  },
-  backBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
-  },
-  pageTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1F2937",
-    marginBottom: 4,
   },
   pageSubtitle: {
     fontSize: 15,
     color: "#6B7280",
+    marginTop: 16,
     marginBottom: 16,
   },
   button: {

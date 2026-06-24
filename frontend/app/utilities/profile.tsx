@@ -2,21 +2,51 @@ import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader } from "@/components/app-header";
+import { SettingsSectionList } from "@/components/user-settings/setting-section-list";
 
 export default function ProfileScreen() {
+
+  const sections = [
+    {
+      title: "Account",
+      items: [
+        {
+          id: "profile-settings",
+          title: "Profile settings",
+          description: "Name, native language, learning language and level",
+          emoji: "👤",
+          onPress: () => {
+            router.push({
+              pathname: "/init-settings",
+              params: { source: "profile" },
+            });
+          },
+        },
+      ],
+    },
+  ];
+
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <AppHeader />
-      <View style={styles.container}>
+      <View style={styles.screenHeader}>
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          style={({ pressed }) => [
+            styles.backIconBtn,
+            pressed && styles.backBtnPressed,
+          ]}
           onPress={() => router.back()}
         >
-          <Text style={styles.backBtnText}>← Back</Text>
+          <Text style={styles.backIcon}>‹</Text>
         </Pressable>
-        <Text style={styles.pageTitle}>Profile</Text>
-        <Text style={styles.placeholder}>Profile page coming soon.</Text>
+
+        <Text style={styles.headerTitle}>Profile</Text>
+
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <View style={styles.container}>
+        <SettingsSectionList sections={sections} />
       </View>
     </SafeAreaView>
   );
@@ -31,16 +61,39 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
   },
-  backBtn: {
-    alignSelf: "flex-start",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
-    marginBottom: 24,
+  screenHeader: {
+    height: 56,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+    backgroundColor: "#F7F4EF",
+  },
+  backIconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+  },
+  backIcon: {
+    fontSize: 36,
+    lineHeight: 36,
+    fontWeight: "600",
+    color: "#2563EB",
   },
   backBtnPressed: {
     opacity: 0.85,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#1F2937",
+  },
+  headerSpacer: {
+    width: 44,
   },
   backBtnText: {
     fontSize: 14,
@@ -51,11 +104,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "800",
     color: "#1F2937",
-    marginBottom: 8,
-  },
-  placeholder: {
-    fontSize: 16,
-    color: "#6B7280",
-    lineHeight: 24,
+    marginBottom: 16,
   },
 });

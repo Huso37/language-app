@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader } from "@/components/app-header";
 import { SavedLessonCard } from "@/components/lesson/saved-lesson-card";
 import { getLessonGameRoute } from "@/lib/lesson-routes";
 import { setCurrentLesson } from "@/lib/lesson-session-store";
@@ -88,18 +87,28 @@ export default function RepeatLessonScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <AppHeader />
-      <View style={styles.content}>
-        <View style={styles.topRow}>
-          <Pressable
-            style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-            onPress={() => (deleteMode ? exitDeleteMode() : router.back())}
-          >
-            <Text style={styles.backBtnText}>
-              {deleteMode ? "Cancel" : "← Back"}
-            </Text>
-          </Pressable>
+      <View style={styles.screenHeader}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.backIconBtn,
+            pressed && styles.backBtnPressed,
+          ]}
+          onPress={() => (deleteMode ? exitDeleteMode() : router.back())}
+        >
+          <Text style={styles.backIcon}>‹</Text>
+        </Pressable>
 
+        <Text style={styles.headerTitle}>Review Lessons</Text>
+
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <View style={styles.content}>
+        <Text style={styles.pageSubtitle}>
+          Your last saved lessons — play them as many times as you like.
+        </Text>
+
+        <View style={styles.actionRow}>
           <Pressable
             style={({ pressed }) => [
               styles.deleteToggleBtn,
@@ -115,15 +124,10 @@ export default function RepeatLessonScreen() {
                 deleteMode && styles.deleteToggleTextActive,
               ]}
             >
-              Delete a lesson
+              {deleteMode ? "Cancel" : "Delete a lesson"}
             </Text>
           </Pressable>
         </View>
-
-        <Text style={styles.pageTitle}>Repeat a lesson</Text>
-        <Text style={styles.pageSubtitle}>
-          Your last saved lessons — play them as many times as you like.
-        </Text>
 
         {lessons === undefined ? (
           <View style={styles.centered}>
@@ -193,27 +197,47 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
   },
-  topRow: {
+  screenHeader: {
+    height: 56,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 8,
-    marginBottom: 8,
-    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+    backgroundColor: "#F7F4EF",
   },
-  backBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "#E5E7EB",
+  backIconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+  },
+  backIcon: {
+    fontSize: 36,
+    lineHeight: 36,
+    fontWeight: "600",
+    color: "#2563EB",
   },
   backBtnPressed: {
     opacity: 0.85,
   },
-  backBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#1F2937",
+  },
+  headerSpacer: {
+    width: 44,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+
+    marginBottom: 12,
+    gap: 12,
   },
   deleteToggleBtn: {
     paddingVertical: 8,
@@ -232,15 +256,10 @@ const styles = StyleSheet.create({
   deleteToggleTextActive: {
     color: "#FFFFFF",
   },
-  pageTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1F2937",
-    marginBottom: 4,
-  },
   pageSubtitle: {
     fontSize: 15,
     color: "#6B7280",
+    marginTop: 16,
     marginBottom: 16,
     lineHeight: 22,
   },
