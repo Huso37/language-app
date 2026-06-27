@@ -1,4 +1,5 @@
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -154,20 +155,42 @@ export function MatchingGame({ words }: MatchingGameProps) {
       </View>
 
       {isComplete && (
-        <View style={styles.sentencesSection}>
-          <Text style={styles.sentencesTitle}>Example sentences</Text>
-          {words.map((word, wordIndex) => (
-            <View key={`sentence-${wordIndex}`} style={styles.sentenceCard}>
-              <Text style={styles.sentenceWordPair}>
-                {word.nativeWord} · {word.targetWord}
-              </Text>
-              <Text style={styles.sentenceText}>{word.exampleSentenceNative}</Text>
-              <Text style={styles.sentenceTextTarget}>
-                {word.exampleSentenceTarget}
-              </Text>
-            </View>
-          ))}
-        </View>
+        <>
+          <View style={styles.completeCard}>
+            <Text style={styles.completeEmoji}>🎉</Text>
+            <Text style={styles.completeTitle}>Matching lesson complete</Text>
+            <Text style={styles.completeSubtitle}>
+              You matched all {words.length} words.
+            </Text>
+          </View>
+
+          <View style={styles.sentencesSection}>
+            <Text style={styles.sentencesTitle}>Example sentences</Text>
+            {words.map((word, wordIndex) => (
+              <View key={`sentence-${wordIndex}`} style={styles.sentenceCard}>
+                <Text style={styles.sentenceWordPair}>
+                  {word.nativeWord} · {word.targetWord}
+                </Text>
+                <Text style={styles.sentenceText}>
+                  {word.exampleSentenceNative}
+                </Text>
+                <Text style={styles.sentenceTextTarget}>
+                  {word.exampleSentenceTarget}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.finishButton,
+              pressed && styles.tilePressed,
+            ]}
+            onPress={() => router.replace("/home")}
+          >
+            <Text style={styles.finishButtonText}>Finish</Text>
+          </Pressable>
+        </>
       )}
     </ScrollView>
   );
@@ -239,6 +262,31 @@ const styles = StyleSheet.create({
   tileTextWrong: {
     color: "#B91C1C",
   },
+  completeCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    padding: 22,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    gap: 8,
+    marginTop: 8,
+  },
+  completeEmoji: {
+    fontSize: 44,
+  },
+  completeTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#1F2937",
+    textAlign: "center",
+  },
+  completeSubtitle: {
+    fontSize: 15,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 22,
+  },
   sentencesSection: {
     gap: 12,
     marginTop: 8,
@@ -271,5 +319,17 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     lineHeight: 20,
     fontStyle: "italic",
+  },
+  finishButton: {
+    backgroundColor: "#1F2937",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  finishButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 16,
   },
 });

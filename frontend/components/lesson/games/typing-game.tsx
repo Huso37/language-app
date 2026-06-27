@@ -1,4 +1,5 @@
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -130,6 +131,16 @@ export function TypingGame({ words }: TypingGameProps) {
             </View>
           ))}
         </View>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.finishButton,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => router.replace("/home")}
+        >
+          <Text style={styles.finishButtonText}>Finish</Text>
+        </Pressable>
       </ScrollView>
     );
   }
@@ -444,5 +455,17 @@ const styles = StyleSheet.create({
   resultText: {
     fontSize: 14,
     color: "#6B7280",
+  },
+  finishButton: {
+    backgroundColor: "#1F2937",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  finishButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 16,
   },
 });

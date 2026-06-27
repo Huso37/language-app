@@ -209,20 +209,21 @@ export function NewLessonForm({ userSettings, onStart }: NewLessonFormProps) {
           onChange={setLessonStyle}
           placeholder="Choose lesson style"
         />
-      </ScrollView>
+      
 
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (pressed || isSubmitting) && styles.buttonPressed,
-        ]}
-        onPress={handleStart}
-        disabled={isSubmitting}
-      >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Starting..." : "Start lesson"}
-        </Text>
-      </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            (pressed || isSubmitting) && styles.buttonPressed,
+          ]}
+          onPress={handleStart}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.buttonText}>
+            {isSubmitting ? "Starting..." : "Start lesson"}
+          </Text>
+        </Pressable>
+        </ScrollView>  
     </View>
   );
 }

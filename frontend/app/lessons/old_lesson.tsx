@@ -108,27 +108,6 @@ export default function RepeatLessonScreen() {
           Your last saved lessons — play them as many times as you like.
         </Text>
 
-        <View style={styles.actionRow}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.deleteToggleBtn,
-              deleteMode && styles.deleteToggleBtnActive,
-              pressed && styles.backBtnPressed,
-            ]}
-            onPress={() => (deleteMode ? exitDeleteMode() : setDeleteMode(true))}
-            disabled={lessons?.length === 0}
-          >
-            <Text
-              style={[
-                styles.deleteToggleText,
-                deleteMode && styles.deleteToggleTextActive,
-              ]}
-            >
-              {deleteMode ? "Cancel" : "Delete a lesson"}
-            </Text>
-          </Pressable>
-        </View>
-
         {lessons === undefined ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color="#1F2937" />
@@ -166,6 +145,27 @@ export default function RepeatLessonScreen() {
             ))}
           </ScrollView>
         )}
+
+        <View style={styles.actionRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.deleteToggleBtn,
+              deleteMode && styles.deleteToggleBtnActive,
+              pressed && styles.backBtnPressed,
+            ]}
+            onPress={() => (deleteMode ? exitDeleteMode() : setDeleteMode(true))}
+            disabled={lessons?.length === 0}
+          >
+            <Text
+              style={[
+                styles.deleteToggleText,
+                deleteMode && styles.deleteToggleTextActive,
+              ]}
+            >
+              {deleteMode ? "Cancel" : "Delete a lesson"}
+            </Text>
+          </Pressable>
+        </View>
 
         {deleteMode && lessons && lessons.length > 0 && (
           <Pressable
