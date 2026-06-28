@@ -2,7 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 
-import { generateLessonRouter } from "../src/routes/generateLesson.js";
+import { generateLessonRouter } from "./routes/generateLesson.js";
 
 dotenv.config();
 
